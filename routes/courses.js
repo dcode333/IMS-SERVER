@@ -16,7 +16,7 @@ const validateCourseMaterial = [
 router.get('/course', async (req, res) => {
     try {
         const courses = await Course.find();
-        res.json(courses);
+        res.status(200).json({ success: true, data: courses });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: true, error: 'Internal Server Error' });
@@ -45,38 +45,6 @@ router.get('/coursecode/:coursecode', async (req, res) => {
 });
 
 
-router.post(
-    '/course',
-    [
-        check('courseCode').isString().not().isEmpty(),
-        check('name').isString().not().isEmpty(),
-        check('department').not().isEmpty(),
-        check('strength').isInt({ min: 0 }).not().isEmpty(),
-    ],
-    async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ success: false, errors: errors.array() });
-        }
-
-        const { courseCode, name, department, strength } = req.body;
-
-        try {
-            const newCourse = new Course({
-                courseCode,
-                name,
-                department,
-                strength,
-            });
-
-            await newCourse.save();
-            res.status(201).json({ success: true, course: newCourse });
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ success: false, error: 'Internal Server Error' });
-        }
-    }
-);
 
 
 // POST route to create a new course material
@@ -84,7 +52,7 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
+        return res.status(400).json({ success: false, error: errors.array() });
     }
 
     const { courseCode, title, description, doc } = req.body;

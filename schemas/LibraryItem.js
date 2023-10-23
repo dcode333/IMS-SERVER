@@ -26,6 +26,23 @@ const libraryItemSchema = new mongoose.Schema({
     type: Boolean,
     default: true, // Default availability is true (available)
   },
+  language: {
+    type: String,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  department: {
+    type: String,
+    required: true,
+  },
+  courseCode: {
+    type: String,
+    required: true,
+  },
+
 });
 
 const LibraryItem = mongoose.model('LibraryItem', libraryItemSchema);

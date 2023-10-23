@@ -122,65 +122,6 @@ router.post(
   })
 
 
-//Registering a user POST /api/auth/register :No login required
-router.post(
-  "/register",
-  [
-    body("email").isEmail(),
-    body("password", "must be min 5 chars").isLength({ min: 5 }),
-    body("name").exists(),
-    body("type").exists(),
-  ],
-  async (req, res) => {
-    const { name, email, password, type } = req.body;
-    console.log(req.body)
-
-    //express-validation
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
-    }
-
-    const User = type === "teacher" ? Teacher : Student;
-    // Checking for a duplicate email
-    User.findOne({ email, type }, (error, docs) => {
-      if (error) res.status(500).send({ success: false, error });
-      if (docs)
-        res.status(500).json({ success: false, error: "Email already exists" });
-      //creating a user after validation and encrypting password
-      else
-        bcrypt.genSalt(10, function (err, salt) {
-          bcrypt.hash(password, salt, function (err, hashedPass) {
-            console.log(hashedPass)
-            User.create({
-              name,
-              email,
-              type,
-              password: hashedPass,
-            }).then((user) => {
-              //data that will be encapsulated in the jwt token
-              let data = { user: { id: user._id } };
-              //Auth jwt token to send user to make every req with this token
-              let authToken = jwt.sign(data, process.env.SECRET_KEY);
-              res
-                .status(200)
-                .send({
-                  success: true,
-                  authToken,
-                  user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    type: user.type,
-                  },
-                });
-            });
-          });
-        });
-    });
-  }
-);
-
 //Logging the user POST /api/auth/login :No login required
 router.post(
   "/login",
@@ -239,9 +180,6 @@ router.get("/getteacher", authenticateRequest, (req, res) => {
     res.status(200).send({ success: true, user });
   }).select("-password");
 });
-
-
-
 
 
 module.exports = router;

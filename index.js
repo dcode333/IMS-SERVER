@@ -5,8 +5,10 @@ const ConnectToMongo = require("./database");
 const dotenv = require('dotenv');
 dotenv.config();
 const port = process.env.PORT || 5000;
-
 ConnectToMongo();
+
+
+
 app.use(cors());
 app.use(express.json()); // parsing body
 app.use("/api/auth", require("./routes/auth"));
@@ -16,6 +18,7 @@ app.use("/api/attendances", require("./routes/attendances"));
 app.use("/api/assignments", require("./routes/assignment"));
 app.use("/api/marks", require("./routes/marks"));
 app.use("/api/library", require("./routes/libraryItems"));
+app.use("/api/admin", require("./routes/admin"));
 
 
 

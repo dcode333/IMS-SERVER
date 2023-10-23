@@ -7,7 +7,7 @@ const courseSchema = new Schema({
     courseCode: {
         type: String,
         required: true,
-        unique: true, // Ensure that course codes are unique
+        unique: true,
     },
     name: {
         type: String,
@@ -19,6 +19,22 @@ const courseSchema = new Schema({
     },
     strength: {
         type: Number,
+        required: true,
+    },
+    duration: {
+        type: String,
+        required: true,
+    },
+    author: {
+        type: String,
+        required: true,
+    },
+    category: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
         required: true,
     },
 

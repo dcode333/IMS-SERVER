@@ -1,17 +1,33 @@
 const mongoose = require("mongoose");
 
-const coursesSchema = new mongoose.Schema({
-  course: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
-    required: true
-  }
-}, { timestamps: true });
+// const coursesSchema = new mongoose.Schema({
+//   course: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'Course',
+//     required: true
+//   }
+// }, { timestamps: true });
 
 
 const UserSchema = mongoose.Schema({
-  name: {
+  firstname: {
     type: String,
+    required: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
+  beltNo: {
+    type: String,
+    required: true,
+  },
+  joiningDate: {
+    type: Date,
+    required: true,
+  },
+  dob: {
+    type: Date,
     required: true,
   },
   email: {
@@ -26,7 +42,38 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  courses: [coursesSchema]
+  gender: {
+    type: String,
+    required: true,
+    enum: ['Male', 'Female', 'Other'],
+  },
+  contactNo: {
+    type: String,
+    required: true,
+  },
+  homeNo: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  picture: {
+    type: String,
+  },
+  designation: {
+    type: String,
+    required: true,
+  },
+  courseCode: {
+    type: String,
+    required: true,
+  },
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+  },
 
 }, { timestamps: true });
 
