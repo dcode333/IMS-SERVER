@@ -76,7 +76,7 @@ router.get('/library-items', async (req, res) => {
 
 
 // POST route to update a library item by ISBN
-router.post('/library/items/edit/:id', validateLibraryItem, async (req, res) => {
+router.post('/library-items/edit/:id', validateLibraryItem, async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -113,7 +113,7 @@ router.post('/library/items/edit/:id', validateLibraryItem, async (req, res) => 
 
 
 // DELETE route to delete a library item by ISBN
-router.delete('/library/items/:id', async (req, res) => {
+router.delete('/library-items/:id', async (req, res) => {
     const id = req.params.id; // ISBN of the library item
 
     try {
