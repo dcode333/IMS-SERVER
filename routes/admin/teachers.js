@@ -119,7 +119,7 @@ route.delete('/teachers/:id', async (req, res) => {
 
     try {
         // Find the student by ID
-        const teacher = await Teacher.findById();
+        const teacher = await Teacher.findById(teacherId);
 
         if (!teacher) {
             return res.status(404).json({ success: false, data: 'teacher not found' });

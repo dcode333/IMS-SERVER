@@ -67,7 +67,7 @@ route.post(
                     courseCode,
                     dob,
                     gender,
-                    password,
+                    password
                 }).then((user) => {
                     //data that will be encapsulated in the jwt token
                     res.status(200).send({
