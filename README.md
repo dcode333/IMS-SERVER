@@ -1,5 +1,5 @@
-# PINGPONG-DesktopApp
-PingPong 2D desktop game built in JAVA-SWING
+# IMS-SERVER
+iNTEGRATED MANAGEMENT SYSTEM FOR PSI
 
 # Development mode 
 ```
