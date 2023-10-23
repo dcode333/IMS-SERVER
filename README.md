@@ -1,2 +1,10 @@
-# Backend
- Node JS backend for UPJOB
+# IMS-SERVER
+INTEGRATED MANAGEMENT SYSTEM FOR PSI
+
+# Development mode 
+```
+node index.js
+
+```
+
+### run
