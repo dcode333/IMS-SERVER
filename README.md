@@ -1,2 +1,2 @@
 # Backend
- Node JS backend for UPJOB
+ Node JS backend for IMS-SERVER
