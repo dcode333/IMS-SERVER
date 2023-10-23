@@ -74,7 +74,7 @@ const validateUpdateProduct = [
 ];
 
 // PUT route to update a product by ID
-router.post('/products/:id', validateUpdateProduct, async (req, res) => {
+router.post('/edit/:id', validateUpdateProduct, async (req, res) => {
     const productId = req.params.id;
     const updateData = req.body;
 

@@ -80,7 +80,7 @@ const validateUpdateSalesRecord = [
 ];
 
 // PUT route to update a sales record by ID
-router.put('/sales/:id', validateUpdateSalesRecord, async (req, res) => {
+router.post('/edit/:id', validateUpdateSalesRecord, async (req, res) => {
   const salesRecordId = req.params.id;
   const updateData = req.body;
 
