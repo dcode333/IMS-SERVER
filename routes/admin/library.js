@@ -18,6 +18,14 @@ const validateLibraryItem = [
     body('courseCode').isString().notEmpty(),
 ];
 
+const updateLibraryItem = [
+    body('title').isString().notEmpty(),
+    body('authorName').isString().notEmpty(),
+    body('publisherName').isString().notEmpty(),
+    body('category').isString().notEmpty(),
+    body('availability').isBoolean(),
+];
+
 // POST route to create a new library item
 router.post('/library-items', validateLibraryItem, async (req, res) => {
     const errors = validationResult(req);
@@ -76,7 +84,7 @@ router.get('/library-items', async (req, res) => {
 
 
 // POST route to update a library item by ISBN
-router.post('/library-items/edit/:id', validateLibraryItem, async (req, res) => {
+router.post('/library-items/edit/:id', updateLibraryItem, async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
