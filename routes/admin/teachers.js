@@ -2,7 +2,7 @@ const express = require('express');
 const route = express.Router();
 const { body, validationResult, param } = require('express-validator');
 const Teacher = require('../../schemas/Teacher');
-
+const sendMail = require('../../utils/sendMail');
 
 // Validation middleware for the assignment
 
@@ -73,9 +73,19 @@ route.post(
                     joiningDate
                 }).then((user) => {
                     //data that will be encapsulated in the jwt token
-                    res.status(200).send({
-                        success: true, data: user
-                    });
+                    sendMail(email, password)
+                        .then(result => {
+                            console.log(result);
+                            res.status(200).send({
+                                success: true, data: user
+                            });
+                        })
+                        .catch(error => {
+                            res.status(500).send({
+                                success: false, error
+                            });
+                        });
+
                 }).catch((err) => {
                     res.status(500).send({ success: false, error: err });
                 });
