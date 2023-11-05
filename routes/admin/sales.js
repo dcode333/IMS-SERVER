@@ -14,6 +14,27 @@ const validateCreateSalesRecord = [
   body('productId').isMongoId().notEmpty(),
 ];
 
+
+// GET route to retrieve monthly sales quantity
+router.get('/monthly-sales', async (req, res) => {
+  try {
+    const sales = await Sales.find(); // Fetch all sales records
+
+    const groupedSales = Array.from({ length: 12 }, (_, month) => ({ month, totalQuantity: 0 }));
+
+    // Update the quantities for months with sales
+    sales.forEach((sale) => {
+      const month = sale.date.getMonth(); // Extract the month from the date
+      groupedSales[month].totalQuantity += sale.quantity;
+    });
+
+    res.status(200).json({ success: true, data: groupedSales });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
 // POST route to create a new sales record
 router.post('/sales', validateCreateSalesRecord, async (req, res) => {
   const errors = validationResult(req);
@@ -40,7 +61,7 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
     product.quantity = product.quantity - quantity;
     await product.save();
 
-    
+
 
     const newSalesRecord = new Sales({
       date,

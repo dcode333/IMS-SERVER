@@ -49,7 +49,7 @@ router.get('/products', async (req, res) => {
 });
 
 // GET route to retrieve a product by ID
-router.get('/products/:id', async (req, res) => {
+router.get('/products/:id', async (req, res) => { 
     const productId = req.params.id;
 
     try {
