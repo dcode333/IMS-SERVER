@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const Sales = require('../../schemas/Sale'); // Import your Mongoose model for Sales
-
+const Product = require('../../schemas/Product'); // Import your Mongoose model for Product
 const router = express.Router();
 
 // Validation middleware for creating a sales record
@@ -11,6 +11,7 @@ const validateCreateSalesRecord = [
   body('productName').isString().notEmpty(),
   body('customerName').isString().notEmpty(),
   body('customerType').isString().notEmpty(),
+  body('productId').isMongoId().notEmpty(),
 ];
 
 // POST route to create a new sales record
@@ -21,15 +22,33 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
 
-  const { date, quantity, productName, customerName, customerType } = req.body;
+  const { date, quantity, productName, customerName, customerType, productId } = req.body;
 
   try {
+
+    const product = await Product.findById(productId);
+
+    if (!product)
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    if (product.quantity == 0)
+      await product.remove();
+
+    if (product.quantity < quantity)
+      return res.status(500).json({ success: false, error: "Quantity is not available" });
+
+
+    product.quantity = product.quantity - quantity;
+    await product.save();
+
+    
+
     const newSalesRecord = new Sales({
       date,
       quantity,
       productName,
       customerName,
       customerType,
+      productId
     });
 
     await newSalesRecord.save();
