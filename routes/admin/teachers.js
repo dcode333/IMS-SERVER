@@ -61,7 +61,6 @@ route.post(
                     type,
                     lastname,
                     beltNo,
-                    registrationDate,
                     homeNo,
                     contactNo,
                     address,

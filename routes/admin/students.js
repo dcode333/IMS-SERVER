@@ -126,6 +126,45 @@ route.get('/students', async (req, res) => {
 });
 
 
+route.get('/students-status', async (req, res) => {
+    let studentStatus = []
+    try {
+        const students = await Student.find().select('-password'); // Exclude the 'password' field
+        console.log(students)
+        for (const student of students) {
+            const course = await Course.find({ courseCode: student.courseCode });
+            let currentStatus = ''
+            let passfail = ''
+            const duration = course?.duration;
+
+            if (new Date(student.registrationDate) + duration >= Date.now()) {
+                currentStatus = "Completed";
+                passfail = "Pass";
+            } else {
+                currentStatus = "In Progress";
+                passfail = "Pending";
+            }
+
+            studentStatus.push({
+                studentName: student.firstname + " " + student.lastname,
+                courseName: course.name,
+                durationStatus: currentStatus,
+                status: passfail,
+                beltNo: student.beltNo,
+            })
+
+
+        }
+
+        console.log('statues', studentStatus)
+        res.status(200).json({ success: true, data: studentStatus });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
 route.delete('/students/:id', async (req, res) => {
     const studentId = req.params.id;
 
