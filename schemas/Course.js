@@ -22,7 +22,7 @@ const courseSchema = new Schema({
         required: true,
     },
     duration: {
-        type: String,
+        type: Number,
         required: true,
     },
     author: {

@@ -2,6 +2,7 @@ const express = require('express');
 const route = express.Router();
 const { body, validationResult, param } = require('express-validator');
 const Student = require('../../schemas/Student');
+const Course = require('../../schemas/Course');
 const sendMail = require('../../utils/sendMail');
 const { generatePassword } = require('../../utils/helpers');
 
@@ -123,6 +124,7 @@ route.get('/students', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
 
 route.delete('/students/:id', async (req, res) => {
     const studentId = req.params.id;

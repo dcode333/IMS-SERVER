@@ -55,7 +55,7 @@ route.post(
                 res.status(500).json({ success: false, error: "Email already exists" });
             //creating a user after validation and encrypting password
             else {
-                User.create({
+                Teacher.create({
                     firstname,
                     email,
                     type,

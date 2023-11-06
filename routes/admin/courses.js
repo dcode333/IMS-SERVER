@@ -10,7 +10,7 @@ route.post(
         check('name').isString().not().isEmpty(),
         check('department').not().isEmpty(),
         check('strength').isInt({ min: 0 }).not().isEmpty(),
-        check('duration').isString().not().isEmpty(),
+        check('duration').isNumeric().isIn([7, 14, 30]),
         check('author').isString().not().isEmpty(),
         check('category').isString().not().isEmpty(),
         check('description').isString().not().isEmpty(),
