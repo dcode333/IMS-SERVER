@@ -66,14 +66,10 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  courseCode: {
-    type: String,
-    required: true,
-  },
-  course: {
+  courseId: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
-  },
+  }],
 
 }, { timestamps: true });
 

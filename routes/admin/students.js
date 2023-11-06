@@ -25,6 +25,7 @@ route.post(
         body("homeNo").exists(),
         body("address").exists(),
         body("courseCode").exists(),
+        body("picture").exists(),
     ],
     async (req, res) => {
         const password = 'ST' + generatePassword();
@@ -37,6 +38,7 @@ route.post(
             registrationDate,
             dob,
             gender,
+            picture,
             contactNo,
             homeNo,
             address,
@@ -69,7 +71,8 @@ route.post(
                     courseCode,
                     dob,
                     gender,
-                    password
+                    password,
+                    picture
                 }).then((user) => {
                     //data that will be encapsulated in the jwt token
 
