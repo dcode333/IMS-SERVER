@@ -3,6 +3,7 @@ const route = express.Router();
 const { body, validationResult, param } = require('express-validator');
 const Student = require('../../schemas/Student');
 const sendMail = require('../../utils/sendMail');
+const { generatePassword } = require('../../utils/helpers');
 
 // Validation middleware for the assignment
 
@@ -12,7 +13,6 @@ route.post(
     "/register",
     [
         body("email").isEmail(),
-        body("password", "must be min 5 chars").isLength({ min: 5 }),
         body("firstname").exists(),
         body("lastname").exists(),
         body("type").exists(),
@@ -26,8 +26,9 @@ route.post(
         body("courseCode").exists(),
     ],
     async (req, res) => {
-        const { email,
-            password,
+        const password = 'ST' + generatePassword();
+        const {
+            email,
             firstname,
             lastname,
             type,
