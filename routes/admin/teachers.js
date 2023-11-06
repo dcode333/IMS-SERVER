@@ -24,6 +24,8 @@ route.post(
         body("homeNo").exists(),
         body("address").exists(),
         body("designation").exists(),
+        body("picture").exists(),
+
     ],
     async (req, res) => {
         const password = 'TE' + generatePassword();
@@ -40,7 +42,8 @@ route.post(
             contactNo,
             homeNo,
             address,
-            courseId
+            courseId,
+            picture
         } = req.body
 
         //express-validation
@@ -70,7 +73,8 @@ route.post(
                     password,
                     designation,
                     joiningDate,
-                    courseId
+                    courseId,
+                    picture
                 }).then((user) => {
                     //data that will be encapsulated in the jwt token
                     sendMail(email, password)
@@ -155,6 +159,7 @@ route.post("/edit/:id",
         body("joiningDate").exists(),
         body("contactNo").exists(),
         body("designation").exists(),
+        body("picture").exists(),
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -182,6 +187,7 @@ route.post("/edit/:id",
             teacher.joiningDate = updateData.joiningDate;
             teacher.contactNo = updateData.contactNo;
             teacher.designation = updateData.designation;
+            teacher.picture = updateData.picture;
 
             // Save the updated student
             await teacher.save();
