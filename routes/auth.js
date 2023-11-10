@@ -2,27 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const Teacher = require("../schemas/Teacher");
 const Student = require("../schemas/Student");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const authenticateRequest = require("../middlewares/authRequest");
 const sendMail = require("../middlewares/mailsender");
-const verify = require("../schemas/Verification");
 const router = express.Router();
 
 
 router.post('/sendmail', sendMail, async (req, res) => {
-
   const { email, pincode, expiry } = req.body;
-
-  verify.create({ email, pin: pincode })
-    .then(() => {
-      res.status(200).json({ success: true, data: { pincode: pincode.toString(), expiry } });
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({ success: false, error: 'Server error' });
-    })
+  res.status(200).json({ success: true, data: { pincode, expiry } });
 });
 
 router.post(
@@ -30,53 +18,28 @@ router.post(
   [
     body("email").exists().isEmail(),
     body("password", "must be min 5 chars").isLength({ min: 5 }),
-    body("type").exists(),
-    body("pin").exists(),
+    body("type").isIn(['teacher', 'student']).exists()
   ],
   async (req, res) => {
-    const { password, email, pin, type } = req.body;
+    const { password, email, type } = req.body;
 
     //express-validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
+      return res.status(400).json({ success: false, error: errors.array() });
     }
 
     try {
-
+      const User = type === "teacher" ? Teacher : Student;
       const findmatching = await User.findOne({ email, type });
       if (!findmatching) return res.status(400).json({ success: false, error: 'No matching email found' });
 
+      const filter = { email, type };
+      const update = { password };
 
-      const isVerified = await verify.findOne({ email, pin });
-      if (!isVerified) return res.status(400).json({ success: false, error: 'Invalid pincode' });
-
-
-      //removing the pincode from the verification collection
-      const removeRecord = await verify.deleteOne({ email, pin });
-      if (!removeRecord) return res.status(500).json({ success: false, error: 'Server error' });
-
-
-      // Checking for a duplicate email
-      const changePass = await User.findOne({ email });
-      if (!changePass) return res.status(500).json({ success: false, error: 'Server error' });
-
-
-      bcrypt.genSalt(10, function (err, salt) {
-        bcrypt.hash(password, salt, async function (err, hashedPass) {
-
-          if (err) return res.status(500).json({ success: false, error: 'Server error' });
-
-          const filter = { email, type };
-          const update = { password: hashedPass };
-
-          const doc = await User.findOneAndUpdate(filter, update, { new: true });
-          if (!doc) return res.status(500).json({ success: false, error: 'Server error' });
-          res.status(200).json({ success: true, data: doc });
-
-        })
-
-      });
+      const doc = await User.findOneAndUpdate(filter, update, { new: true }).select("-password");
+      if (!doc) return res.status(500).json({ success: false, error: 'Server error' });
+      res.status(200).json({ success: true, data: doc });
 
     } catch (error) {
       console.error(error);
@@ -128,14 +91,14 @@ router.post(
   [
     body("email").isEmail().exists(),
     body("password", "must be min 5 chars").isLength({ min: 5 }),
-    body("type"),
+    body("type").isIn(['teacher', 'student', 'admin', 'iadmin']).exists()
   ],
   (req, res) => {
     const { email, password, type } = req.body;
     //express-validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ success: false, errors: errors.array() });
+      return res.status(400).json({ success: false, error: errors.array() });
     }
 
     const User = type === "teacher" ? Teacher : Student;
@@ -144,22 +107,14 @@ router.post(
       if (error) res.status(500).send({ success: false, error });
       if (user) {
         console.log(user)
-        bcrypt.compare(password, user.password, function (err, matched) {
-          if (matched) {
-            //data that will be encapsulated in the jwt token
-            let data = { user: { id: user._id } };
-            //Auth jwt token to send user to make every req with this token
-            let authToken = jwt.sign(data, process.env.SECRET_KEY);
-            res.status(200).send({
-              success: true,
-              authToken,
-              user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-              },
-            });
-          } else res.status(400).send({ success: false, message: "Invalid Credentials" });
+
+        res.status(200).send({
+          success: true,
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+          },
         });
       } else res.status(400).send({ success: false, message: "User not found" });
     });
