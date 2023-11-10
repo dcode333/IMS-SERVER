@@ -6,7 +6,7 @@ const route = express.Router();
 // Validation middleware for the assignment
 const validateAssignment = [
     body('title').isString().notEmpty(),
-    body('courseCode').isString().notEmpty(),
+    body('courseId').isMongoId().notEmpty(),
 ];
 
 const validateSubmission = [
@@ -49,16 +49,16 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
+        return res.status(400).json({ success: false, error: errors.array() });
     }
 
-    const { title, courseCode, doc } = req.body;
+    const { title, courseId, doc } = req.body;
 
     try {
         // Create a new Assignment document
         const newAssignment = new Assignment({
             title,
-            courseCode,
+            courseId,
             doc
         });
 
@@ -72,12 +72,19 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
     }
 });
 
-route.get('/getassignments/:courseCode', async (req, res) => {
-    const courseCode = req.params.courseCode;
+route.get('/getassignments/:courseId', async (req, res) => {
+    const courseId = req.params.courseId;
 
     try {
         // Find assignments with the provided course code
-        const assignments = await Assignment.find({ courseCode });
+        const assignments = await Assignment.find({ courseId }).populate({
+            path: 'submissions',
+            populate: {
+                path: 'studentId',
+                model: 'Student',
+                select: '-password',
+            },
+        });
 
         res.status(200).json({ success: true, data: assignments });
     } catch (err) {

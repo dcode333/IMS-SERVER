@@ -29,8 +29,9 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    courseCode: {
-        type: String,
+    courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course', // Reference to the Course model
         required: true,
     },
     startDate: {

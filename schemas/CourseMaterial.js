@@ -13,8 +13,9 @@ const courseMaterialSchema = new mongoose.Schema({
         type: String, // Assuming you store the document's path or URL
         required: true,
     },
-    courseCode: {
-        type: String,
+    courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
         required: true,
     },
 });

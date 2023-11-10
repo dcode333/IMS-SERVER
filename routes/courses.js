@@ -7,7 +7,7 @@ const CourseMaterial = require('../schemas/CourseMaterial'); // Import your Mong
 const router = express.Router();
 
 const validateCourseMaterial = [
-    body('courseCode').isString().notEmpty(),
+    body('courseId').isMongoId().notEmpty(),
     body('title').isString().notEmpty(),
     body('description').isString().notEmpty(),
     body('doc').isString().notEmpty(),
@@ -55,10 +55,10 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
         return res.status(400).json({ success: false, error: errors.array() });
     }
 
-    const { courseCode, title, description, doc } = req.body;
+    const { courseId, title, description, doc } = req.body;
 
     try {
-        const newCourseMaterial = new CourseMaterial({ courseCode, title, description, doc });
+        const newCourseMaterial = new CourseMaterial({ courseId, title, description, doc });
         const savedCourseMaterial = await newCourseMaterial.save();
 
         res.status(201).json({ success: true, message: 'Course material created', data: savedCourseMaterial });
@@ -69,12 +69,12 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
 });
 
 
-router.get('/course-materials/:courseCode', async (req, res) => {
-    const courseCode = req.params.courseCode;
+router.get('/course-materials/:courseId', async (req, res) => {
+    const courseId = req.params.courseId;
 
     try {
         // Find course materials that match the provided course code
-        const courseMaterials = await CourseMaterial.find({ courseCode });
+        const courseMaterials = await CourseMaterial.find({ courseId });
         res.status(200).json({ success: true, message: 'Course materials retrieved', data: courseMaterials });
 
     } catch (err) {
