@@ -105,8 +105,8 @@ router.post(
     //checking if the user exists or not based on email
     User.findOne({ email, type }, (error, user) => {
       if (error) res.status(500).send({ success: false, error });
-      if (user) {
-        console.log(user)
+      if (user && user.password === password && user.email === email) {
+
 
         res.status(200).send({
           success: true,
@@ -116,7 +116,7 @@ router.post(
             email: user.email,
           },
         });
-      } else res.status(400).send({ success: false, message: "User not found" });
+      } else res.status(400).send({ success: false, error: "Invalid Credentials" });
     });
   }
 );

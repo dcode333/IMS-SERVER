@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const url = 'mongodb+srv://admin-umair:test123@cluster0.xg387ne.mongodb.net/IMSSERVER'
 // process.env.MONGO_URL;
+const url = 'mongodb+srv://admin-umair:test123@cluster0.xg387ne.mongodb.net/IMSSERVER' 
  
 
 const ConnectToMongo = () => {
@@ -11,7 +11,7 @@ const ConnectToMongo = () => {
       console.log("DB Connection Succesful");
     })
     .catch((e) => {
-      console.log("Something went wrong Umair ! : ", e);
+      console.log("Something went while connecting to DB: ", e);
     });
 };
 
