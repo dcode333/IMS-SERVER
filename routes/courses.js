@@ -8,6 +8,7 @@ const router = express.Router();
 
 const validateCourseMaterial = [
     body('courseId').isMongoId().notEmpty(),
+    body('teacherId').isMongoId().notEmpty(),
     body('title').isString().notEmpty(),
     body('description').isString().notEmpty(),
     body('doc').isString().notEmpty(),
@@ -55,10 +56,11 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
         return res.status(400).json({ success: false, error: errors.array() });
     }
 
-    const { courseId, title, description, doc } = req.body;
+    const { courseId, teacherId, title, description, doc } = req.body;
+    console.log(req.body)
 
     try {
-        const newCourseMaterial = new CourseMaterial({ courseId, title, description, doc });
+        const newCourseMaterial = new CourseMaterial({ courseId, title, description, teacherId, doc });
         const savedCourseMaterial = await newCourseMaterial.save();
 
         res.status(201).json({ success: true, message: 'Course material created', data: savedCourseMaterial });
@@ -69,12 +71,13 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
 });
 
 
-router.get('/course-materials/:courseId', async (req, res) => {
+router.get('/course-materials/:courseId/:teacherId', async (req, res) => {
     const courseId = req.params.courseId;
+    const teacherId = req.params.teacherId;
 
     try {
         // Find course materials that match the provided course code
-        const courseMaterials = await CourseMaterial.find({ courseId });
+        const courseMaterials = await CourseMaterial.find({ courseId, teacherId });
         res.status(200).json({ success: true, message: 'Course materials retrieved', data: courseMaterials });
 
     } catch (err) {

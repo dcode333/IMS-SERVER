@@ -7,6 +7,7 @@ const route = express.Router();
 const validateAssignment = [
     body('title').isString().notEmpty(),
     body('courseId').isMongoId().notEmpty(),
+    body('teacherId').isMongoId().notEmpty()
 ];
 
 const validateSubmission = [
@@ -52,13 +53,14 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
         return res.status(400).json({ success: false, error: errors.array() });
     }
 
-    const { title, courseId, doc } = req.body;
+    const { title, courseId, doc, teacherId } = req.body;
 
     try {
         // Create a new Assignment document
         const newAssignment = new Assignment({
             title,
             courseId,
+            teacherId,
             doc
         });
 
@@ -72,12 +74,14 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
     }
 });
 
-route.get('/getassignments/:courseId', async (req, res) => {
+route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
     const courseId = req.params.courseId;
+    const teacherId = req.params.teacherId;
+
 
     try {
         // Find assignments with the provided course code
-        const assignments = await Assignment.find({ courseId }).populate({
+        const assignments = await Assignment.find({ courseId, teacherId }).populate({
             path: 'submissions',
             populate: {
                 path: 'studentId',

@@ -18,6 +18,12 @@ const courseMaterialSchema = new mongoose.Schema({
         ref: 'Course',
         required: true,
     },
+    teacherId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Teacher',
+        required: true,
+    },
+
 });
 
 const CourseMaterial = mongoose.model('CourseMaterial', courseMaterialSchema);

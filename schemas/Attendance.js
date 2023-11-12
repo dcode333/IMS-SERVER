@@ -1,26 +1,43 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const Attendance = new Schema({
-    attendance: {
-        type: Boolean,
-        required: true
+const studentAttendanceSchema = new mongoose.Schema({
+    date: {
+        type: Date,
+        required: true,
     },
-    student: {
+    present: {
+        type: Boolean,
+        required: true,
+    },
+});
+
+const studentSchema = new mongoose.Schema({
+    studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
-        required: true
+        required: true,
     },
-    course: {
+    attendance: {
+        type: [studentAttendanceSchema],
+        default: [],
+    },
+});
+
+const courseSchema = new mongoose.Schema({
+    courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course',
+        required: true,
+    },
+    attendancePercentage: {
         type: String,
-        required: true
     },
-    Date: {
-        type: Date,
-        default: new Date().toLocaleDateString() // Use the `Date.now` function to set the default date
-    }
-}, { timestamps: true });
+    students: {
+        type: [studentSchema],
+        default: [],
+    },
+});
 
-const Course = mongoose.model('Attendance', Attendance);
+const Attendance = mongoose.model('Attendance', courseSchema);
 
-module.exports = Course;
+module.exports = Attendance;

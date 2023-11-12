@@ -34,6 +34,11 @@ const assignmentSchema = new mongoose.Schema({
         ref: 'Course', // Reference to the Course model
         required: true,
     },
+    teacherId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Teacher', // Reference to the Teacher model
+        required: true,
+    },
     startDate: {
         type: Date,
         default: getDate(0), // Use the `Date.now` function to set the default date

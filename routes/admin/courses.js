@@ -45,8 +45,8 @@ route.post(
                 description,
             });
 
-            await newCourse.save();
-            res.status(201).json({ success: true, course: newCourse });
+            const newAddedCourse = await newCourse.save();
+            res.status(201).json({ success: true, course: newAddedCourse });
         } catch (err) {
             console.error(err);
             res.status(500).json({ success: false, error: 'Internal Server Error' });
