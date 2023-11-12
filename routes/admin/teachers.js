@@ -4,6 +4,7 @@ const { body, validationResult, param } = require('express-validator');
 const Teacher = require('../../schemas/Teacher');
 const sendMail = require('../../utils/sendMail');
 const { generatePassword } = require('../../utils/helpers');
+const Attendance = require('../../schemas/Attendance')
 
 // Validation middleware for the assignment
 
@@ -25,7 +26,7 @@ route.post(
         body("address").exists(),
         body("designation").exists(),
         body("picture").exists(),
-
+        body("courseId").isArray(),
     ],
     async (req, res) => {
         const password = 'TE' + generatePassword();
@@ -75,8 +76,23 @@ route.post(
                     joiningDate,
                     courseId,
                     picture
-                }).then((user) => {
+                }).then(async (user) => {
                     //data that will be encapsulated in the jwt token
+
+                    try {
+                        for (const course of courseId) {
+                            const attendance = new Attendance({
+                                courseId: course,
+                                teacherId: user._id,
+                                students: [],
+                            });
+                            const newAtt = await attendance.save();
+                            console.log(newAtt);
+                        }
+
+                    } catch (err) {
+                        console.log("Error while creating attendances: ", err)
+                    }
                     sendMail(email, password)
                         .then(result => {
                             console.log(result);

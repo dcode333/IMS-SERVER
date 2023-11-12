@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 
+function getDate(daysAhead) {
+    const currentDate = new Date();
+    const threeDaysFromNow = new Date(currentDate);
+    threeDaysFromNow.setDate(currentDate.getDate() + daysAhead)
+    return threeDaysFromNow.toLocaleDateString();
+}
+
 const studentAttendanceSchema = new mongoose.Schema({
     date: {
         type: Date,
@@ -15,7 +22,6 @@ const studentSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
-        required: true,
     },
     attendance: {
         type: [studentAttendanceSchema],
@@ -27,6 +33,11 @@ const courseSchema = new mongoose.Schema({
     courseId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
+        required: true,
+    },
+    teacherId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Teacher',
         required: true,
     },
     attendancePercentage: {

@@ -1,7 +1,7 @@
 // attendanceRoutes.js
 
 const express = require('express');
-const { check, validationResult } = require('express-validator');
+const { check, validationResult, body } = require('express-validator');
 const mongoose = require('mongoose');
 const Attendance = require('../schemas/Attendance'); // Import your Mongoose model
 
@@ -15,36 +15,29 @@ const validateAttendanceRecord = [
 ];
 
 // POST route to save an array of Attendance records
-router.post('/save-attendance', async (req, res) => {
-    const attendanceArray = req.body; // Assuming req.body is an array of objects
+router.put('/mark-attendance/:courseId/:teacherId', body("students").isArray(), async (req, res) => {
+    const { courseId, teacherId } = req.params;
+    const { students } = req.body;
 
     try {
-        // Validate each attendance record
-        for (const attendanceData of attendanceArray) {
-            await Promise.all(validateAttendanceRecord.map(validation => validation.run(attendanceData)));
+        // Find attendance based on courseId and teacherId
+        const attendance = await Attendance.findOne({ courseId, teacherId });
+
+        if (!attendance) {
+            return res.status(404).json({ success: false, message: 'Attendance not found' });
         }
 
-        // Check for validation errors
-        const errors = validationResult(req);
 
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ success: false, errors: errors.array() });
-        }
+        // Update the entire students field with the data from req.body
+        attendance.students = students;
 
-        // Iterate through the array and save each attendance record
-        const savedAttendance = await Promise.all(
-            attendanceArray.map(async (attendanceData) => {
-                // Create a new Attendance document
-                const newAttendance = new Attendance(attendanceData);
-                // Save the document
-                return newAttendance.save();
-            })
-        );
+        // Save the updated attendance
+        const updatedAttendance = await attendance.save();
 
-        res.status(201).json({ success: true, data: savedAttendance });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        return res.status(200).json({ success: true, data: updatedAttendance });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
 
@@ -62,18 +55,32 @@ router.get('/attendance/:courseCode', async (req, res) => {
     }
 });
 
-router.get('/attendance/:courseCode/:studentId', async (req, res) => {
-    const courseCode = req.params.courseCode;
-    const studentId = req.params.studentId;
+router.get('/attendances/:courseId/:teacherId', async (req, res) => {
+    const courseId = req.params.courseId;
+    const teacherId = req.params.teacherId;
 
     try {
         // Find the attendance records related to the course
-        const attendanceRecords = await Attendance.find({ course: courseCode, student: studentId }).populate({ path: 'student', select: '-password' });
+        const attendanceRecords = await Attendance.find({ courseId, teacherId })
+            .populate({
+                path: 'students.studentId',
+                select: '-password', // Exclude the 'password' field
+            })
+            .populate('courseId'); // Populate the 'courseId' field
 
-        res.status(200).json({ message: 'Attendance records found', data: attendanceRecords });
+        attendanceRecords.forEach((record) => {
+            record.students.forEach((student) => {
+                student.attendance.push({
+                    date: new Date().toLocaleDateString("en-US"),
+                    present: false,
+                });
+            });
+        });
+
+        res.status(200).json({ success: true, data: attendanceRecords });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
 

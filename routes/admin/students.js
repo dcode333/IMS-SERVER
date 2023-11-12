@@ -5,6 +5,7 @@ const Student = require('../../schemas/Student');
 const Course = require('../../schemas/Course');
 const sendMail = require('../../utils/sendMail');
 const { generatePassword } = require('../../utils/helpers');
+const Attendance = require('../../schemas/Attendance')
 
 // Validation middleware for the assignment
 
@@ -24,7 +25,8 @@ route.post(
         body("contactNo").exists(),
         body("homeNo").exists(),
         body("address").exists(),
-        body("courseCode").exists(),
+        body("courseId").isMongoId().exists(),
+        body("teacherId").isMongoId().exists(),
         body("picture").exists(),
     ],
     async (req, res) => {
@@ -42,12 +44,13 @@ route.post(
             contactNo,
             homeNo,
             address,
-            courseCode } = req.body
+            courseId,
+            teacherId } = req.body
 
         //express-validation
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ success: false, errors: errors.array() });
+            return res.status(400).json({ success: false, error: errors.array() });
         }
 
         const User = type === "teacher" ? Teacher : Student;
@@ -68,13 +71,32 @@ route.post(
                     homeNo,
                     contactNo,
                     address,
-                    courseCode,
+                    courseId,
+                    teacherId,
                     dob,
                     gender,
                     password,
                     picture
-                }).then((user) => {
-                    //data that will be encapsulated in the jwt token
+                }).then(async (user) => {
+
+                    try {
+                        const result = await Attendance.findOneAndUpdate(
+                            { courseId: courseId, teacherId: teacherId },
+                            {
+                                $addToSet: {
+                                    students: {
+                                        studentId: user._id,
+                                        attendance: [], // You can set the initial attendance status
+                                    },
+                                },
+                            },
+                            { new: true, upsert: true }
+                        );
+
+                        console.log("Stdudent Added to Attendance", result)
+                    }
+                    catch (e) { console.log(e); }
+
 
                     sendMail(email, password)
                         .then(result => {

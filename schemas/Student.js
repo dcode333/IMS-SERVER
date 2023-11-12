@@ -1,4 +1,4 @@
-  const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 
 const UserSchema = mongoose.Schema({
@@ -57,14 +57,14 @@ const UserSchema = mongoose.Schema({
   picture: {
     type: String,
   },
-  courseCode: {
-    type: String,
-    required: true,
-  },
-  CourseId: [{
+  courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Course",
-  }],
+  },
+  teacherId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Teacher",
+  }
 
 }, { timestamps: true });
 

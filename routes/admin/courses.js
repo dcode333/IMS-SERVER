@@ -14,7 +14,7 @@ route.post(
         check('author').isString().not().isEmpty(),
         check('category').isString().not().isEmpty(),
         check('description').isString().not().isEmpty(),
-
+    
     ],
     async (req, res) => {
         const errors = validationResult(req);
