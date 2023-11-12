@@ -16,7 +16,7 @@ route.post(
         body("email").isEmail(),
         body("firstname").exists(),
         body("lastname").exists(),
-        body("type").exists(),
+        body("type").exists().isIn(["teacher"]),
         body("beltNo").exists(),
         body("joiningDate").exists(),
         body("dob").exists(),
