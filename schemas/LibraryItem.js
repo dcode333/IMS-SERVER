@@ -38,8 +38,9 @@ const libraryItemSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  courseCode: {
-    type: String,
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
     required: true,
   },
 

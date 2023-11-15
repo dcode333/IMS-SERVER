@@ -9,13 +9,14 @@ const LibraryItem = require('../../schemas/LibraryItem'); // Import your Mongoos
 const validateLibraryItem = [
     body('title').isString().notEmpty(),
     body('authorName').isString().notEmpty(),
+    body('publisherName').isString().notEmpty(),
     body('isbn').isString().notEmpty(),
     body('category').isString().notEmpty(),
     body('availability').isBoolean(),
     body('language').isString().notEmpty(),
     body('quantity').isNumeric().notEmpty(),
     body('department').isString().notEmpty(),
-    body('courseCode').isString().notEmpty(),
+    body('courseId').isString().notEmpty(),
 ];
 
 const updateLibraryItem = [
@@ -24,14 +25,17 @@ const updateLibraryItem = [
     body('publisherName').isString().notEmpty(),
     body('category').isString().notEmpty(),
     body('availability').isBoolean(),
-];
+    body('language').isString().notEmpty(),
+    body('quantity').isNumeric().notEmpty(),
+    body('department').isString().notEmpty(),
+    body('courseId').isMongoId().notEmpty(),];
 
 // POST route to create a new library item
 router.post('/library-items', validateLibraryItem, async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
+        return res.status(400).json({ success: false, error: errors.array() });
     }
 
     const {
@@ -44,7 +48,7 @@ router.post('/library-items', validateLibraryItem, async (req, res) => {
         language,
         quantity,
         department,
-        courseCode
+        courseId
     } = req.body;
 
     try {
@@ -58,14 +62,14 @@ router.post('/library-items', validateLibraryItem, async (req, res) => {
             language,
             quantity,
             department,
-            courseCode
+            courseId
         });
         const savedLibraryItem = await newLibraryItem.save();
 
         res.status(201).json({ success: true, message: 'Library item created', data: savedLibraryItem });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 
@@ -92,30 +96,42 @@ router.post('/library-items/edit/:id', updateLibraryItem, async (req, res) => {
     }
 
     const id = req.params.id; // ISBN of the library item
-    const updateData = req.body; // Updated attributes
+
+    const {
+        title,
+        authorName,
+        publisherName,
+        isbn,
+        category,
+        availability,
+        language,
+        quantity,
+        department,
+        courseId
+    } = req.body;
 
     try {
-        // Find the library item by ISBN
-        const libraryItem = await LibraryItem.findById(id);
+        // Use await to ensure the update is executed and retrieve the updated document
+        const editedBook = await LibraryItem.findByIdAndUpdate(id, {
+            title,
+            authorName,
+            publisherName,
+            category,
+            availability,
+            language,
+            quantity,
+            department,
+            courseId
+        }, { new: true });
 
-        if (!libraryItem) {
+        if (!editedBook) {
             return res.status(404).json({ success: false, error: 'Library item not found' });
         }
 
-        // Update the specified attributes
-        libraryItem.title = updateData.title;
-        libraryItem.authorName = updateData.authorName;
-        libraryItem.publisherName = updateData.publisherName;
-        libraryItem.category = updateData.category;
-        libraryItem.availability = updateData.availability;
-
-        // Save the updated library item
-        await libraryItem.save();
-
-        res.status(200).json({ success: true, message: 'Library item updated', data: libraryItem });
+        res.status(200).json({ success: true, message: 'Library item updated', data: editedBook });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message });
     }
 });
 

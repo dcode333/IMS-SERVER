@@ -1,11 +1,12 @@
 const express = require('express');
 const route = express.Router();
 const { body, validationResult, param } = require('express-validator');
-const Student = require('../../schemas/Student');
 const Course = require('../../schemas/Course');
 const sendMail = require('../../utils/sendMail');
 const { generatePassword } = require('../../utils/helpers');
 const Attendance = require('../../schemas/Attendance')
+const Student = require('../../schemas/Student');
+const Teacher = require('../../schemas/Teacher');
 
 // Validation middleware for the assignment
 
@@ -220,7 +221,7 @@ route.post("/edit/:id",
         body("beltNo").exists(),
         body("registrationDate").exists(),
         body("contactNo").exists(),
-        body("courseCode").exists(),
+        body("courseId").isMongoId().exists(),
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -230,27 +231,31 @@ route.post("/edit/:id",
         }
 
         const studentId = req.params.id;
-        const updateData = req.body; // Updated attributes
+        const {
+            email,
+            firstname,
+            lastname,
+            beltNo,
+            registrationDate,
+            contactNo,
+            courseId,
+        } = req.body
 
         try {
             // Find the student by ID
-            const student = await Student.findById(studentId);
+            const student = await Student.findByIdAndUpdate(studentId, {
+                email,
+                firstname,
+                lastname,
+                beltNo,
+                registrationDate,
+                contactNo,
+                courseId,
+            }, { new: true });
 
             if (!student) {
                 return res.status(404).json({ success: false, error: 'Student not found' });
             }
-
-            // Update only the specified attributes
-            student.email = updateData.email;
-            student.firstname = updateData.firstname;
-            student.lastname = updateData.lastname;
-            student.beltNo = updateData.beltNo;
-            student.registrationDate = updateData.registrationDate;
-            student.contactNo = updateData.contactNo;
-            student.courseCode = updateData.courseCode;
-
-            // Save the updated student
-            await student.save();
 
             res.status(200).json({ success: true, message: 'Student attributes updated', data: student });
         } catch (err) {
