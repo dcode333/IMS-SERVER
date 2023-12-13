@@ -136,8 +136,8 @@ router.get("/getstudent", authenticateRequest, (req, res) => {
   }).populate('Course').select("-password");
 });
 
-router.get("/getteacher", authenticateRequest, (req, res) => {
-  Teacher.findById(req.user.id, (error, user) => {
+router.get("/getteacher/:teacherId", (req, res) => {
+  Teacher.findById(req.params.teacherId, (error, user) => {
     if (error) res.status(500).send({ success: false, error });
     res.status(200).send({ success: true, user });
   }).select("-password");
