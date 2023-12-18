@@ -1,6 +1,6 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const TimeTable = require('../../schemas/TimeTable'); // Assuming you've defined the TimeTable model
+const TimeTable = require('../../schemas/TimeTable'); 
 const Teacher = require('../../schemas/Teacher');
 const Course = require('../../schemas/Course');
 const router = express.Router();
