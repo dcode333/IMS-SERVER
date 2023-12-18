@@ -78,7 +78,22 @@ router.get('/course-materials/:courseId/:teacherId', async (req, res) => {
     try {
         // Find course materials that match the provided course code
         const courseMaterials = await CourseMaterial.find({ courseId, teacherId });
-        res.status(200).json({ success: true, message: 'Course materials retrieved', data: courseMaterials });
+        res.status(200).json({ success: true, message: 'Course materials for specific couseId and teacherId retrieved', data: courseMaterials });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
+router.get('/course-materials/:teacherId', async (req, res) => {
+    const teacherId = req.params.teacherId;
+
+    try {
+        // Find course materials that match the provided course code
+        const courseMaterials = await CourseMaterial.find({ teacherId });
+        res.status(200).json({ success: true, message: 'Course materials for specific teacherId retrieved', data: courseMaterials });
 
     } catch (err) {
         console.error(err);

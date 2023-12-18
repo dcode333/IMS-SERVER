@@ -90,7 +90,31 @@ route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
             },
         });
 
-        res.status(200).json({ success: true, data: assignments });
+        res.status(200).json({ success: true,message:'Assignments retrieved for specific courseId and teacherId', data: assignments });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
+route.get('/getassignments/:teacherId', async (req, res) => {
+
+    const teacherId = req.params.teacherId;
+
+    try {
+        // Find assignments with the provided course code
+        const assignments = await Assignment.find({ teacherId }).populate({
+            path: 'submissions',
+            populate: {
+                path: 'studentId',
+                model: 'Student',
+                select: '-password',
+            },
+        });
+
+        res.status(200).json({ success: true,message:'Assignments retrieved for specific teacherId', data: assignments });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
