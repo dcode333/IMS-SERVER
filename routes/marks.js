@@ -7,7 +7,7 @@ const Marks = require('../schemas/Mark');
 const validateMark = [
     body('studentId').isMongoId(),
     body('obtainedMarks').isNumeric(),
-    body('courseCode').isString(),
+    body('courseId').isMongoId(),
     body('exam').isIn(['assignment', 'quiz', 's1', 's2', 'terminal']),
 ];
 
@@ -16,13 +16,13 @@ router.post('/create-mark', validateMark, async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
+        return res.status(400).json({ success: false, error: errors.array() });
     }
 
-    const { studentId, obtainedMarks, totalMarks, courseCode, exam } = req.body;
+    const { studentId, obtainedMarks, totalMarks, courseId, exam } = req.body;
 
     try {
-        const newMark = new Marks({ studentId, obtainedMarks, totalMarks, courseCode, exam });
+        const newMark = new Marks({ studentId, obtainedMarks, totalMarks, courseId, exam });
         const savedMark = await newMark.save();
 
         res.status(201).json({ success: true, message: 'Mark created', data: savedMark });
@@ -33,13 +33,13 @@ router.post('/create-mark', validateMark, async (req, res) => {
 });
 
 // GET route to get marks by exam and course code
-router.get('/mark/:courseCode/:exam', async (req, res) => {
+router.get('/mark/:courseId/:exam', async (req, res) => {
     const exam = req.params.exam;
-    const courseCode = req.params.courseCode;
+    const courseId = req.params.courseId;
 
     try {
         // Find marks that match the provided exam and course code
-        const marks = await Marks.find({ exam, courseCode });
+        const marks = await Marks.find({ exam, courseId });
 
         res.status(200).json({ success: true, message: 'Marks retrieved', data: marks });
     } catch (err) {
@@ -48,14 +48,14 @@ router.get('/mark/:courseCode/:exam', async (req, res) => {
     }
 });
 
-router.get('/mark/:courseCode/:exam/:studentId', async (req, res) => {
+router.get('/mark/:courseId/:exam/:studentId', async (req, res) => {
     const exam = req.params.exam;
-    const courseCode = req.params.courseCode;
+    const courseId = req.params.courseId;
     const studentId = req.params.studentId;
 
     try {
         // Find marks that match the provided exam and course code
-        const marks = await Marks.find({ exam, courseCode, studentId });
+        const marks = await Marks.find({ exam, courseId, studentId });
 
         res.status(200).json({ success: true, message: 'Marks retrieved', data: marks });
     } catch (err) {

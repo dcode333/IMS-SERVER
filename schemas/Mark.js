@@ -14,8 +14,9 @@ const marksSchema = new mongoose.Schema({
         type: Number,
         default: 100,
     },
-    courseCode: {
-        type: String,
+    courseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course', // Reference to the Course model
         required: true,
     },
     exam: {
