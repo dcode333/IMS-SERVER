@@ -4,6 +4,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const LibraryItem = require('../../schemas/LibraryItem'); // Import your Mongoose model for LibraryItem
+const IssueLibraryItem = require('../../schemas/IssueLibraryItem');
 
 // Validation middleware for creating a library item
 const validateLibraryItem = [
@@ -29,6 +30,12 @@ const updateLibraryItem = [
     body('quantity').isNumeric().notEmpty(),
     body('department').isString().notEmpty(),
     body('courseId').isMongoId().notEmpty(),];
+
+// Validation middleware for issuing a library item
+const validateIssueLibraryItem = [
+    body('issueLibraryItemId').isMongoId().notEmpty(),
+    body('libraryItemId').isMongoId().notEmpty(),
+];
 
 // POST route to create a new library item
 router.post('/library-items', validateLibraryItem, async (req, res) => {
@@ -157,6 +164,66 @@ router.delete('/library-items/:id', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
 });
+
+// GET route to retrieve a All issued library item 
+
+router.get('/library-items/issued', async (req, res) => {
+    try {
+        const libraryItems = await LibraryItem.find({ availability: false });
+
+        res.status(200).json({ success: true, message: 'Issued library items retrieved', data: libraryItems });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+// GET route to retrieve a All issue requests 
+
+router.get('/library-items/issue-requests', async (req, res) => {
+    try {
+        const libraryItems = await IssueLibraryItem.find({ status: 'pending' });
+
+        res.status(200).json({ success: true, message: 'requested library items retrieved', data: libraryItems });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+}
+);
+
+// POST route to issue a library item
+
+router.post('/library-items/issue-book', validateIssueLibraryItem, async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ success: false, error: errors.array() });
+
+    const { issueLibraryItemId, libraryItemId } = req.body;
+
+    try {
+
+        const issueLibraryItem = await IssueLibraryItem.findById(issueLibraryItemId);
+        issueLibraryItem.status = 'issued';
+        const savedIssueLibraryItem = await issueLibraryItem.save();
+
+        const libraryItem = await LibraryItem.findById(libraryItemId);
+        libraryItem.availability = false;
+        await libraryItem.save();
+
+        res.status(201).json({ success: true, message: 'Library item issued', data: savedIssueLibraryItem });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+
+})
+
+
+
+
+
 
 
 module.exports = router;
