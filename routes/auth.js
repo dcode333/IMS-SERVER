@@ -129,17 +129,19 @@ router.post(
 );
 
 //Getting the user Info GET /api/auth/getuser : login (Tokened) required
-router.get("/getstudent", authenticateRequest, (req, res) => {
-  Student.findById(req.user.id, (error, user) => {
-    if (error) res.status(500).send({ success: false, error });
-    res.status(200).send({ success: true, user });
-  }).populate('Course').select("-password");
-});
 
 router.get("/getteacher/:teacherId", (req, res) => {
   Teacher.findById(req.params.teacherId, (error, user) => {
     if (error) res.status(500).send({ success: false, error });
-    res.status(200).send({ success: true, user });
+    else res.status(200).send({ success: true, user });
+  }).select("-password");
+});
+
+
+router.get("/getstudent/:studentId", (req, res) => {
+  Student.findById(req.params.studentId, (error, user) => {
+    if (error) res.status(500).send({ success: false, error });
+    else res.status(200).send({ success: true, user });
   }).select("-password");
 });
 

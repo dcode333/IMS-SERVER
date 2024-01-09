@@ -118,7 +118,7 @@ router.post('/library-items/edit/:id', updateLibraryItem, async (req, res) => {
     } = req.body;
 
     try {
-        // Use await to ensure the update is executed and retrieve the updated document
+
         const editedBook = await LibraryItem.findByIdAndUpdate(id, {
             title,
             authorName,
