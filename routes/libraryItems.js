@@ -47,7 +47,7 @@ router.post('/library-items', validateLibraryItem, async (req, res) => {
 // GET route to retrieve all library items
 router.get('/library-items', async (req, res) => {
     try {
-        const libraryItems = await LibraryItem.find();
+        const libraryItems = await LibraryItem.find({ availability: true });
 
         res.status(200).json({ success: true, message: 'Library items retrieved', data: libraryItems });
     } catch (err) {

@@ -90,7 +90,7 @@ route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
             },
         });
 
-        res.status(200).json({ success: true,message:'Assignments retrieved for specific courseId and teacherId', data: assignments });
+        res.status(200).json({ success: true, message: 'Assignments retrieved for specific courseId and teacherId', data: assignments });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
@@ -113,7 +113,7 @@ route.get('/getassignments/:teacherId', async (req, res) => {
             },
         });
 
-        res.status(200).json({ success: true,message:'Assignments retrieved for specific teacherId', data: assignments });
+        res.status(200).json({ success: true, message: 'Assignments retrieved for specific teacherId', data: assignments });
 
     } catch (err) {
         console.error(err);
