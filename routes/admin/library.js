@@ -76,7 +76,7 @@ router.post('/library-items', validateLibraryItem, async (req, res) => {
         res.status(201).json({ success: true, message: 'Library item created', data: savedLibraryItem });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -88,7 +88,7 @@ router.get('/library-items', async (req, res) => {
         res.status(200).json({ success: true, message: 'Library items retrieved', data: libraryItems });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -138,7 +138,7 @@ router.post('/library-items/edit/:id', updateLibraryItem, async (req, res) => {
         res.status(200).json({ success: true, message: 'Library item updated', data: editedBook });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: err.message });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -161,7 +161,7 @@ router.delete('/library-items/:id', async (req, res) => {
         res.status(200).json({ success: true, message: 'Library item deleted' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -174,7 +174,7 @@ router.get('/library-items/issued', async (req, res) => {
         res.status(200).json({ success: true, message: 'Issued library items retrieved', data: libraryItems });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -187,7 +187,7 @@ router.get('/library-items/issue-requests', async (req, res) => {
         res.status(200).json({ success: true, message: 'requested library items retrieved', data: libraryItems });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 }
 );
@@ -215,7 +215,7 @@ router.post('/library-items/issue-book', validateIssueLibraryItem, async (req, r
     }
     catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 
 })
