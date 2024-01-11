@@ -65,5 +65,39 @@ router.get('/mark/:courseId/:exam/:studentId', async (req, res) => {
 });
 
 
+//GET route to get marks by studentId and courseId
+
+router.get('/marks-summary/:studentId/:courseId', async (req, res) => {
+    const studentId = req.params.studentId;
+    const courseId = req.params.courseId;
+
+    try {
+        // Find marks that match the provided exam and course code
+        const marks = await Marks.find({ studentId, courseId });
+
+        const assignments = marks.filter(mark => mark.exam === 'assignment');
+        const quizes = marks.filter(mark => mark.exam === 'quiz');
+        const s1 = marks.filter(mark => mark.exam === 's1');
+        const s2 = marks.filter(mark => mark.exam === 's2');
+        const terminals = marks.filter(mark => mark.exam === 'terminal');
+
+        res.status(200).json({
+            success: true, message: 'Marks retrieved', data: {
+                assignments,
+                quizes,
+                s1,
+                s2,
+                terminals
+            }
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
+    }
+}
+);
+
+
 
 module.exports = router;
