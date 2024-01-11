@@ -74,7 +74,31 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
     }
 });
 
+
+// GET route to get assignments by courseId,teacherId (Student)
 route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
+    const courseId = req.params.courseId;
+    const teacherId = req.params.teacherId;
+
+
+    try {
+        // Find assignments with the provided course code
+        const assignments = await Assignment.find({ courseId, teacherId })
+
+        const assignmentsWithSubmissionIds = assignments.map((assignment) => {
+            const submissions = assignment.submissions.map((submission) => submission._id);
+            return { ...assignment._doc, submissions };
+        });
+
+        res.status(200).json({ success: true, message: 'Assignments retrieved for specific courseId and teacherId', data: assignmentsWithSubmissionIds });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+// GET route to get assignments by courseId,teacherId (Teacher)
+route.get('/getassignmentstt/:courseId/:teacherId', async (req, res) => {
     const courseId = req.params.courseId;
     const teacherId = req.params.teacherId;
 

@@ -4,12 +4,14 @@ const { body, validationResult } = require('express-validator');
 const Marks = require('../schemas/Mark');
 
 // Validation middleware for creating a mark
+const assesments = ['assignment', 'quiz', 's1', 's2', 'terminal'];
 const validateMark = [
     body('studentId').isMongoId(),
     body('obtainedMarks').isNumeric(),
     body('courseId').isMongoId(),
-    body('exam').isIn(['assignment', 'quiz', 's1', 's2', 'terminal']),
+    body('exam').isIn(assesments),
 ];
+
 
 // POST route to create a mark
 router.post('/create-mark', validateMark, async (req, res) => {
@@ -28,23 +30,28 @@ router.post('/create-mark', validateMark, async (req, res) => {
         res.status(201).json({ success: true, message: 'Mark created', data: savedMark });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
-// GET route to get marks by exam and course code
+// GET route to get marks by exam and courseId (Teacher)
 router.get('/mark/:courseId/:exam', async (req, res) => {
     const exam = req.params.exam;
     const courseId = req.params.courseId;
+
+    if (!assesments.includes(exam))
+        return res.status(400).json({ success: false, error: 'Invalid exam type' });
+
 
     try {
         // Find marks that match the provided exam and course code
         const marks = await Marks.find({ exam, courseId });
 
         res.status(200).json({ success: true, message: 'Marks retrieved', data: marks });
+
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -60,13 +67,12 @@ router.get('/mark/:courseId/:exam/:studentId', async (req, res) => {
         res.status(200).json({ success: true, message: 'Marks retrieved', data: marks });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
 
-//GET route to get marks by studentId and courseId
-
+//GET route to get marks-summary by studentId and courseId (STUDENT)
 router.get('/marks-summary/:studentId/:courseId', async (req, res) => {
     const studentId = req.params.studentId;
     const courseId = req.params.courseId;
