@@ -86,7 +86,7 @@ route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
         const assignments = await Assignment.find({ courseId, teacherId })
 
         const assignmentsWithSubmissionIds = assignments.map((assignment) => {
-            const submissions = assignment.submissions.map((submission) => submission._id);
+            const submissions = assignment.submissions.map((submission) => submission.studentId);
             return { ...assignment._doc, submissions };
         });
 
