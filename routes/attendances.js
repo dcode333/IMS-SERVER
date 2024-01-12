@@ -1,18 +1,11 @@
 // attendanceRoutes.js
 
 const express = require('express');
-const { check, validationResult, body } = require('express-validator');
-const mongoose = require('mongoose');
+const { body } = require('express-validator');
 const Attendance = require('../schemas/Attendance'); // Import your Mongoose model
 
 const router = express.Router();
 
-// Validation middleware for a single attendance record
-const validateAttendanceRecord = [
-    check('attendance').isNumeric(),
-    check('student').isMongoId(),
-    check('course').isString(),
-];
 
 // POST route to save an array of Attendance records
 router.put('/mark-attendance/:courseId/:teacherId', body("students").isArray(), async (req, res) => {
@@ -36,24 +29,11 @@ router.put('/mark-attendance/:courseId/:teacherId', body("students").isArray(), 
 
         return res.status(200).json({ success: true, data: updatedAttendance });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
+
     }
 });
 
-router.get('/attendance/:courseCode', async (req, res) => {
-    const courseCode = req.params.courseCode;
-
-    try {
-        // Find the attendance records related to the course
-        const attendanceRecords = await Attendance.find({ course: courseCode }).populate({ path: 'student', select: '-password' });
-
-        res.status(200).json({ message: 'Attendance records found', data: attendanceRecords });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
 
 router.get('/attendances/:courseId/:teacherId', async (req, res) => {
     const courseId = req.params.courseId;
@@ -80,8 +60,42 @@ router.get('/attendances/:courseId/:teacherId', async (req, res) => {
         res.status(200).json({ success: true, data: attendanceRecords });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
     }
+});
+
+
+// GET attendance of a student
+
+router.get('/attendance/:studentId/:teacherId/:courseId', async (req, res) => {
+
+    const { courseId, teacherId, studentId } = req.params;
+
+    try {
+        const attendanceRecord = await Attendance.findOne({
+            courseId: courseId,
+            teacherId: teacherId,
+            'students.studentId': studentId,
+        });
+
+        if (!attendanceRecord) {
+            return res.status(404).json({ success: false, error: 'Attendance not found' });
+        }
+
+        const student = attendanceRecord.students.find(
+            (s) => String(s.studentId) === studentId
+        );
+
+        if (!student) {
+            return res.status(404).json({ success: false, error: 'Student not found for this attendance' });
+        }
+
+        res.status(200).json({ success: true, data: student });
+    } catch (error) {
+
+        res.status(500).json({ success: false, error: error.message || 'Internal Server Error' });
+    }
+
 });
 
 
