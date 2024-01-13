@@ -48,16 +48,16 @@ router.get('/coursecode/:coursecode', async (req, res) => {
 
 
 
-// POST route to create a new course material
+// POST route to create a new course material (Teacher)
 router.post('/create-course-material', validateCourseMaterial, async (req, res) => {
     const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
+    if (!errors.isEmpty()) 
         return res.status(400).json({ success: false, error: errors.array() });
-    }
+    
 
     const { courseId, teacherId, title, description, doc } = req.body;
-    console.log(req.body)
+    
 
     try {
         const newCourseMaterial = new CourseMaterial({ courseId, title, description, teacherId, doc });
@@ -71,6 +71,8 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
 });
 
 
+
+// GET route to get course materials by courseId,teacherId (Common)
 router.get('/course-materials/:courseId/:teacherId', async (req, res) => {
     const courseId = req.params.courseId;
     const teacherId = req.params.teacherId;

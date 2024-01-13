@@ -53,7 +53,7 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
         return res.status(400).json({ success: false, error: errors.array() });
     }
 
-    const { title, courseId, doc, teacherId } = req.body;
+    const { title, courseId, doc, teacherId, startDate, endDate } = req.body;
 
     try {
         // Create a new Assignment document
@@ -61,7 +61,9 @@ route.post('/create-assignment', validateAssignment, async (req, res) => {
             title,
             courseId,
             teacherId,
-            doc
+            doc,
+            startDate,
+            endDate
         });
 
         // Save the assignment to the database
@@ -136,6 +138,8 @@ route.get('/getassignments/:teacherId', async (req, res) => {
                 select: '-password',
             },
         });
+
+
 
         res.status(200).json({ success: true, message: 'Assignments retrieved for specific teacherId', data: assignments });
 
