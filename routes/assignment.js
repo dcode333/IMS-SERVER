@@ -98,7 +98,7 @@ route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
 });
 
 // GET route to get assignments by courseId,teacherId (Teacher)
-route.get('/getassignmentstt/:courseId/:teacherId', async (req, res) => {
+route.get('/teacherassignments/:courseId/:teacherId', async (req, res) => {
     const courseId = req.params.courseId;
     const teacherId = req.params.teacherId;
 
