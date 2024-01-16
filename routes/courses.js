@@ -20,7 +20,7 @@ router.get('/course', async (req, res) => {
         res.status(200).json({ success: true, data: courses });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: true, error: 'Internal Server Error' });
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -41,7 +41,8 @@ router.get('/coursecode/:coursecode', async (req, res) => {
         res.status(200).json({ success: true, course });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
+
     }
 });
 
@@ -52,12 +53,12 @@ router.get('/coursecode/:coursecode', async (req, res) => {
 router.post('/create-course-material', validateCourseMaterial, async (req, res) => {
     const errors = validationResult(req);
 
-    if (!errors.isEmpty()) 
+    if (!errors.isEmpty())
         return res.status(400).json({ success: false, error: errors.array() });
-    
+
 
     const { courseId, teacherId, title, description, doc } = req.body;
-    
+
 
     try {
         const newCourseMaterial = new CourseMaterial({ courseId, title, description, teacherId, doc });
@@ -66,7 +67,8 @@ router.post('/create-course-material', validateCourseMaterial, async (req, res) 
         res.status(201).json({ success: true, message: 'Course material created', data: savedCourseMaterial });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
+
     }
 });
 
@@ -84,7 +86,51 @@ router.get('/course-materials/:courseId/:teacherId', async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
+    }
+});
+
+// Delete route to delete course materials by courseId,teacherId (Teacher)
+router.delete('/course-materials/:coursematerialId', async (req, res) => {
+    const coursematerialId = req.params.coursematerialId;
+
+    try {
+        const courseMaterials = await CourseMaterial.deleteOne({ _id: coursematerialId });
+        res.status(200).json({
+            success: true,
+            message: 'Course materials for specific couse Material',
+            data: courseMaterials
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
+    }
+});
+
+// Edit course material by coursematerialId
+router.put('/course-materials/:coursematerialId', async (req, res) => {
+    const coursematerialId = req.params.coursematerialId;
+
+    try {
+        const courseMaterials = await CourseMaterial.findById(coursematerialId);
+
+        if (!courseMaterials) return res.status(404).json({ success: false, error: 'Course material not found' });
+
+
+        const { title, description, doc } = req.body;
+
+        if (title) courseMaterials.title = title;
+        if (description) courseMaterials.description = description;
+        if (doc) courseMaterials.doc = doc;
+
+        const savedCourseMaterial = await courseMaterials.save({ new: true });
+
+        res.status(200).json({ success: true, message: 'Course material updated', data: savedCourseMaterial });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
     }
 });
 
@@ -99,7 +145,8 @@ router.get('/course-materials/:teacherId', async (req, res) => {
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
+        res.status(500).json({ success: true, error: err.message || 'Internal Server Error' });
+
     }
 });
 
