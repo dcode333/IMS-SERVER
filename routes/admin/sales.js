@@ -50,7 +50,7 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
 
     if (!product)
       return res.status(404).json({ success: false, message: 'Product not found' });
-    if (product.quantity == 0)
+    if (product.quantity === 0)
       await product.remove();
 
     if (product.quantity < quantity)
