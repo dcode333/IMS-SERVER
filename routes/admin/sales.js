@@ -8,7 +8,6 @@ const router = express.Router();
 const validateCreateSalesRecord = [
   body('date').isDate().notEmpty(),
   body('quantity').isNumeric().notEmpty(),
-  body('productName').isString().notEmpty(),
   body('customerName').isString().notEmpty(),
   body('customerType').isString().notEmpty(),
   body('productId').isMongoId().notEmpty(),
@@ -43,7 +42,7 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
     return res.status(400).json({ success: false, errors: errors.array() });
   }
 
-  const { date, quantity, productName, customerName, customerType, productId } = req.body;
+  const { date, quantity, customerName, customerType, productId } = req.body;
 
   try {
 
@@ -66,7 +65,6 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
     const newSalesRecord = new Sales({
       date,
       quantity,
-      productName,
       customerName,
       customerType,
       productId
@@ -114,7 +112,6 @@ router.get('/sales/:id', async (req, res) => {
 const validateUpdateSalesRecord = [
   body('date').isISO8601().toDate().optional(),
   body('quantity').isNumeric().optional(),
-  body('productName').isString().optional(),
   body('customerName').isString().optional(),
   body('customerType').isString().optional(),
 ];
@@ -133,7 +130,6 @@ router.post('/edit/:id', validateUpdateSalesRecord, async (req, res) => {
 
     if (updateData.date) salesRecord.date = updateData.date;
     if (updateData.quantity) salesRecord.quantity = updateData.quantity;
-    if (updateData.productName) salesRecord.productName = updateData.productName;
     if (updateData.customerName) salesRecord.customerName = updateData.customerName;
     if (updateData.customerType) salesRecord.customerType = updateData.customerType;
 

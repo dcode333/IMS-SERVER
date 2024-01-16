@@ -9,10 +9,6 @@ const salesSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  productName: {
-    type: String,
-    required: true,
-  },
   customerName: {
     type: String,
     required: true,
