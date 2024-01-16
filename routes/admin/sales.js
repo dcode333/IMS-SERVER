@@ -134,10 +134,12 @@ router.post('/edit/:id', validateUpdateSalesRecord, async (req, res) => {
     if (updateData.customerName) salesRecord.customerName = updateData.customerName;
     if (updateData.customerType) salesRecord.customerType = updateData.customerType;
 
-    await salesRecord.save();
+    const updatedSalesRecord = await salesRecord.save({ new: true });
 
-    res.status(200).json({ success: true, message: 'Sales record updated', data: salesRecord });
+    res.status(200).json({ success: true, message: 'Sales record updated', data: updatedSalesRecord });
+
   } catch (err) {
+
     console.error(err);
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
