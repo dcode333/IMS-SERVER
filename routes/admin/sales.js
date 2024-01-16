@@ -54,7 +54,7 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
       await product.remove();
 
     if (product.quantity < quantity)
-      return res.status(500).json({ success: false, error: "Quantity is not available" });
+      return res.status(401).json({ success: false, error: "Quantity is not available" });
 
 
     product.quantity = product.quantity - quantity;
