@@ -39,7 +39,7 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
+    return res.status(400).json({ success: false, error: errors.array() });
   }
 
   const { date, quantity, customerName, customerType, productId } = req.body;
@@ -82,7 +82,8 @@ router.post('/sales', validateCreateSalesRecord, async (req, res) => {
 // GET route to retrieve all sales records
 router.get('/sales', async (req, res) => {
   try {
-    const salesRecords = await Sales.find();
+    const salesRecords = await Sales.find().populate('productId');
+
     res.status(200).json({ success: true, data: salesRecords });
   } catch (err) {
     console.error(err);
