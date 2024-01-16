@@ -142,7 +142,8 @@ route.get('/students/:id', validateObjectId, async (req, res) => {
 
 route.get('/students', async (req, res) => {
     try {
-        const students = await Student.find().select('-password'); // Exclude the 'password' field
+        const students = await Student.find().select('-password').populate('courseId');
+
 
         res.status(200).json({ success: true, data: students });
     } catch (err) {
@@ -156,9 +157,10 @@ route.get('/students-status', async (req, res) => {
     let studentStatus = []
     try {
         const students = await Student.find().select('-password'); // Exclude the 'password' field
-        console.log(students)
+
         for (const student of students) {
-            const course = await Course.find({ courseCode: student.courseCode });
+            const course = await Course.findById(student.courseId);
+            console.log("s", student, "c", course)
             let currentStatus = ''
             let passfail = ''
             const duration = course?.duration;
@@ -173,16 +175,13 @@ route.get('/students-status', async (req, res) => {
 
             studentStatus.push({
                 studentName: student.firstname + " " + student.lastname,
-                courseName: course.name,
+                courseName: course.name ? course.name : 'N/A',
                 durationStatus: currentStatus,
                 status: passfail,
                 beltNo: student.beltNo,
             })
 
-
         }
-
-        console.log('statues', studentStatus)
         res.status(200).json({ success: true, data: studentStatus });
     } catch (err) {
         console.error(err);
