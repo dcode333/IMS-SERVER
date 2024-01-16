@@ -1,20 +1,9 @@
 const express = require('express');
-const { check, validationResult } = require('express-validator');
-const TimeTable = require('../../schemas/TimeTable'); 
+const { check, validationResult, body } = require('express-validator');
+const TimeTable = require('../../schemas/TimeTable');
 const Teacher = require('../../schemas/Teacher');
 const Course = require('../../schemas/Course');
 const router = express.Router();
-
-// GET route to retrieve timetable entries
-router.get('/timetable', async (req, res) => {
-    try {
-        const timetableEntries = await TimeTable.find();
-        res.status(200).json({ success: true, data: timetableEntries });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, error: 'Internal Server Error' });
-    }
-});
 
 router.get('/contents', async (req, res) => {
     try {
@@ -37,44 +26,44 @@ router.get('/contents', async (req, res) => {
 });
 
 
-// POST route to add a new timetable entry
-router.post('/timetable', [
-    check('courseCode').not().isEmpty(),
-    check('room').not().isEmpty(),
-    check('time').not().isEmpty(),
-    check('day').not().isEmpty(),
-    check('teacherName').not().isEmpty(),
-], async (req, res) => {
-    // Validate input
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { courseCode, room, time, day, teacherName } = req.body;
-
+// GET route to retrieve timetable entries
+router.get('/timetable', async (req, res) => {
     try {
-        // Check if a document with the same room, time, and day combination already exists
-        const existingEntry = await TimeTable.findOne({ room, time, day, courseCode });
 
-        if (existingEntry) {
-            return res.status(400).json({ success: false, error: 'A timetable entry with the same room, time, and day already exists.' });
-        }
+        const timetableEntries = await TimeTable.findById('65a6a45d17dce9099f734ebc');
 
-        // Create and save the new timetable entry
-        const newTimetableEntry = new TimeTable({
-            courseCode,
-            room,
-            time,
-            day,
-            teacherName,
-        });
+        res.status(200).json({ success: true, data: timetableEntries });
 
-        await newTimetableEntry.save();
-        res.status(201).json({ success: true, data: newTimetableEntry })
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
+// POST route to add a new timetable entry
+router.put('/timetable', body("timetable").isArray(), async (req, res) => {
+
+    // Validate input
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) return res.status(500).json({ success: false, error: errors.array() });
+
+    const timetable = await TimeTable.findById('65a6a45d17dce9099f734ebc');
+
+    try {
+
+        // Update the entire timetable field with the data from req.body
+        timetable.timetable = req.body.timetable;
+
+        // Save the updated timetable
+        const updatedTimeTable = await timetable.save();
+
+        res.status(201).json({ success: true, data: updatedTimeTable, message: 'TimeTable Updated' })
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, error: err.message || 'Internal Server Error' });
     }
 });
 
