@@ -87,12 +87,12 @@ route.get('/getassignments/:courseId/:teacherId', async (req, res) => {
         // Find assignments with the provided course code
         const assignments = await Assignment.find({ courseId, teacherId })
 
-        const assignmentsWithSubmissionIds = assignments.map((assignment) => {
-            const submissions = assignment.submissions.map((submission) => submission.studentId);
-            return { ...assignment._doc, submissions };
-        });
+        // const assignmentsWithSubmissionIds = assignments.map((assignment) => {
+        //     const submissions = assignment.submissions.map((submission) => submission.studentId);
+        //     return { ...assignment, submissions };
+        // });
 
-        res.status(200).json({ success: true, message: 'Assignments retrieved for specific courseId and teacherId', data: assignmentsWithSubmissionIds });
+        res.status(200).json({ success: true, message: 'Assignments retrieved for specific courseId and teacherId', data: assignments });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, error: 'Internal Server Error' });

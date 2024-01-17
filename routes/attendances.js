@@ -48,8 +48,10 @@ router.get('/attendances/:courseId/:teacherId', async (req, res) => {
             })
             .populate('courseId'); // Populate the 'courseId' field
 
+
         attendanceRecords.forEach((record) => {
             record.students.forEach((student) => {
+                console.log(student)
                 student.attendance.push({
                     date: new Date().toLocaleDateString("en-US"),
                     present: false,
