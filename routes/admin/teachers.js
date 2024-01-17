@@ -180,35 +180,39 @@ route.post("/edit/:id",
     async (req, res) => {
         const errors = validationResult(req);
 
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ success: false, error: errors.array() });
-        }
+        if (!errors.isEmpty()) return res.status(400).json({ success: false, error: errors.array() });
+
 
         const teacherId = req.params.id;
-        const updateData = req.body; // Updated attributes
+        const {
+            email,
+            firstname,
+            lastname,
+            beltNo,
+            joiningDate,
+            designation,
+            contactNo,
+            picture
+        } = req.body; // Updated attributes
 
         try {
             // Find the student by ID
-            const teacher = await Teacher.findById(teacherId);
+            const teacher = await Teacher.findByIdAndUpdate(teacherId, {
+                email,
+                firstname,
+                lastname,
+                beltNo,
+                joiningDate,
+                designation,
+                contactNo,
+                picture
+            }, { new: true });
 
-            if (!teacher) {
-                return res.status(404).json({ success: false, error: 'teacher not found' });
-            }
-
-            // Update only the specified attributes
-            teacher.email = updateData.email;
-            teacher.firstname = updateData.firstname;
-            teacher.lastname = updateData.lastname;
-            teacher.beltNo = updateData.beltNo;
-            teacher.joiningDate = updateData.joiningDate;
-            teacher.contactNo = updateData.contactNo;
-            teacher.designation = updateData.designation;
-            teacher.picture = updateData.picture;
-
-            // Save the updated student
-            await teacher.save();
+            if (!teacher) return res.status(404).json({ success: false, error: 'Teacher not found' });
 
             res.status(200).json({ success: true, message: 'teacher attributes updated', data: teacher });
+
+
         } catch (err) {
             console.error(err);
             res.status(500).json({ success: false, error: 'Internal Server Error' });
