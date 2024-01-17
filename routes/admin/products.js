@@ -49,7 +49,7 @@ router.get('/products', async (req, res) => {
 });
 
 // GET route to retrieve a product by ID
-router.get('/products/:id', async (req, res) => { 
+router.get('/products/:id', async (req, res) => {
     const productId = req.params.id;
 
     try {
@@ -79,17 +79,11 @@ router.post('/edit/:id', validateUpdateProduct, async (req, res) => {
     const updateData = req.body;
 
     try {
-        const product = await Product.findById(productId);
+        const product = await Product.findByIdAndUpdate(productId, updateData, { new: true });
 
         if (!product) {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
-
-        if (updateData.name) product.name = updateData.name;
-        if (updateData.category) product.category = updateData.category;
-        if (updateData.quantity) product.quantity = updateData.quantity;
-
-        await product.save();
 
         res.status(200).json({ success: true, message: 'Product updated', data: product });
     } catch (err) {
