@@ -54,7 +54,7 @@ route.post(
     }
 );
 
-route.put('/course/:id', validateCourse, async (req, res) => {
+route.post('/course/:id', validateCourse, async (req, res) => {
 
     const courseId = req.params.id;
     const {
