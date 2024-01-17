@@ -220,7 +220,6 @@ route.post("/edit/:id",
         body("beltNo").exists(),
         body("registrationDate").exists(),
         body("contactNo").exists(),
-        body("courseId").isMongoId().exists(),
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -249,7 +248,6 @@ route.post("/edit/:id",
                 beltNo,
                 registrationDate,
                 contactNo,
-                courseId,
             }, { new: true });
 
             if (!student) {
