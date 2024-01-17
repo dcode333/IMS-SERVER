@@ -57,9 +57,8 @@ route.post(
         const User = type === "teacher" ? Teacher : Student;
         // Checking for a duplicate email
         User.findOne({ email, type }, (error, docs) => {
-            if (error) res.status(500).send({ success: false, error });
-            if (docs)
-                res.status(500).json({ success: false, error: "Email already exists" });
+            if (error) return res.status(401).send({ success: false, error });
+            if (docs) return res.status(401).json({ success: false, error: "Email already exists" });
             //creating a user after validation and encrypting password
             else {
                 User.create({
@@ -236,7 +235,6 @@ route.post("/edit/:id",
             beltNo,
             registrationDate,
             contactNo,
-            courseId,
         } = req.body
 
         try {

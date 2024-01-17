@@ -29,7 +29,7 @@ const updateLibraryItem = [
     body('language').isString().notEmpty(),
     body('quantity').isNumeric().notEmpty(),
     body('department').isString().notEmpty(),
-    body('courseId').isMongoId().notEmpty(),];
+];
 
 // Validation middleware for issuing a library item
 const validateIssueLibraryItem = [
@@ -114,7 +114,6 @@ router.post('/library-items/edit/:id', updateLibraryItem, async (req, res) => {
         language,
         quantity,
         department,
-        courseId
     } = req.body;
 
     try {
@@ -124,11 +123,11 @@ router.post('/library-items/edit/:id', updateLibraryItem, async (req, res) => {
             authorName,
             publisherName,
             category,
+            isbn,
             availability,
             language,
             quantity,
             department,
-            courseId
         }, { new: true });
 
         if (!editedBook) {
